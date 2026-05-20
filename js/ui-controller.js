@@ -218,4 +218,50 @@ export function initUI(engine) {
     }
 
     updateCopyButtonLabel();
+    initCookbookReader();
+}
+
+function initCookbookReader() {
+    const guideCards = document.querySelectorAll('.guide-card');
+    const readerModal = document.getElementById('reader-modal');
+    const readerBody = document.getElementById('reader-body');
+    const closeReaderBtn = document.getElementById('close-reader');
+    const modalBackdrop = readerModal?.querySelector('.modal-backdrop');
+
+    if (!readerModal || !readerBody || !closeReaderBtn || !modalBackdrop) {
+        return;
+    }
+
+    function openReader(contentHtml) {
+        readerBody.innerHTML = contentHtml;
+        readerModal.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeReader() {
+        readerModal.classList.remove('is-open');
+        readerBody.innerHTML = '';
+        document.body.style.overflow = '';
+    }
+
+    guideCards.forEach((card) => {
+        card.addEventListener('click', () => {
+            const hiddenContent = card.querySelector('.guide-content-hidden');
+
+            if (!hiddenContent) {
+                return;
+            }
+
+            openReader(hiddenContent.innerHTML);
+        });
+    });
+
+    closeReaderBtn.addEventListener('click', closeReader);
+    modalBackdrop.addEventListener('click', closeReader);
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && readerModal.classList.contains('is-open')) {
+            closeReader();
+        }
+    });
 }

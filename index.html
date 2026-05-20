@@ -3,93 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TableMask — Syntax Labs</title>
+    <title>TableMask — Safe AI Workflows for Sensitive Data | Syntax Labs</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header class="app-header">
-        <div class="logo-zone">
-            <span class="brand">Syntax Labs</span>
-            <h1>TableMask <span class="version">v1.0</span></h1>
+    <div class="landing-page">
+        <header class="app-header">
+            <a href="#top" class="logo-link">
+                <div class="logo-zone">
+                    <span class="brand">Syntax Labs</span>
+                    <p class="product-name">TableMask <span class="version">v1.0</span></p>
+                </div>
+            </a>
+            <nav class="header-nav" aria-label="Main navigation">
+                <a href="#demo" class="nav-link">Demo</a>
+                <a href="#pricing" class="nav-link">Pricing</a>
+                <a href="#cookbook" class="nav-link">Cookbook</a>
+                <a href="#faq" class="nav-link">FAQ</a>
+            </nav>
+        </header>
+
+        <section id="top" class="hero-section">
+            <h1 class="hero-title">Paste into ChatGPT without exposing client data.</h1>
+            <p class="hero-subtitle">Mask names, emails, salaries, and internal info locally in your browser before sharing data with AI tools.</p>
+            <div class="trust-pills">
+                <span class="pill">🔒 100% Local</span>
+                <span class="pill">☁️ No Uploads</span>
+                <span class="pill">🇪🇺 GDPR-Friendly</span>
+                <span class="pill">⚡ AI-Safe Workflows</span>
+            </div>
+        </section>
+
+        <section id="demo" class="demo-section">
+            <p class="demo-label">Interactive Demo — try it now</p>
+            <main class="app-container">
+                <!-- Левая панель: Инпуты и Настройки -->
+                <section class="panel input-panel">
+                    <div class="panel-header">
+                        <h2>Raw Input</h2>
+                        <div class="panel-actions">
+                            <button id="clear-btn" class="btn btn-secondary">Clear</button>
+                        </div>
+                    </div>
+                    
+                    <textarea id="data-input" placeholder="Paste your text, CSV, or JSON here..." spellcheck="false"></textarea>
+                    
+                    <div class="settings-bar">
+                        <h3>Active Filters</h3>
+                        <div class="filters-grid">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="filter-email" checked>
+                                <span class="checkmark"></span> Emails
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="filter-phone" checked>
+                                <span class="checkmark"></span> Phones
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="filter-card" checked>
+                                <span class="checkmark"></span> Credit Cards
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="filter-ip" checked>
+                                <span class="checkmark"></span> IP Addresses
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="filter-name" checked>
+                                <span class="checkmark"></span> Names
+                            </label>
+                        </div>
+                        <div class="custom-rules-zone">
+                            <label for="custom-keywords" class="custom-rules-label">Custom Keywords (comma-separated)</label>
+                            <input type="text" id="custom-keywords" placeholder="e.g., Project X, Apple, Confidential, 50000">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Правая панель: Результат маскировки / де-анонимизации -->
+                <section class="panel output-panel">
+                    <div class="panel-header">
+                        <h2>Output</h2>
+                        <div class="panel-actions">
+                            <button id="copy-btn" class="btn btn-primary">Copy Anonymized</button>
+                        </div>
+                    </div>
+
+                    <div class="panel-tabs">
+                        <button id="tab-anonymize" class="tab-btn active" type="button">Anonymized Output</button>
+                        <button id="tab-unmask" class="tab-btn" type="button">De-anonymize Response</button>
+                    </div>
+
+                    <div class="output-content">
+                        <div id="data-output" class="output-view output-display is-active" contenteditable="false" data-placeholder="Anonymized data will appear here..."></div>
+
+                        <div id="unmask-zone" class="output-view unmask-zone">
+                            <textarea id="ai-response-input" placeholder="Paste AI response with tags here (e.g. Dear [NAME_1]...)" spellcheck="false"></textarea>
+                            <div id="unmask-display" class="output-display unmask-result" contenteditable="false" data-placeholder="Restored data will appear here..."></div>
+                        </div>
+                    </div>
+                    
+                    <div class="status-bar">
+                        <div class="status-left">
+                            <span id="stats-counter">0 leaks blocked</span>
+                            <span id="loading-indicator" class="loading-indicator">⚡ Processing...</span>
+                        </div>
+                        <span class="secure-badge">🔒 100% Local (Zero-Data-Transfer)</span>
+                    </div>
+                </section>
+            </main>
+        </section>
+
+        <section id="pricing" class="pricing-section">
+            <h2 class="section-title">Simple, Transparent Pricing</h2>
+            <p class="section-subtitle">Protect your company and client data without recurring monthly fees.</p>
+            <div class="pricing-grid">
+                <div class="price-card">
+                    <h3>Free Plan</h3>
+                    <div class="price">$0</div>
+                    <p class="card-desc">Perfect for quick, basic text masking.</p>
+                    <ul class="features-list">
+                        <li>✓ Basic PII Masking (Emails, IPs)</li>
+                        <li>✓ Up to 1,000 characters per paste</li>
+                        <li>✓ 100% Local processing</li>
+                    </ul>
+                    <button class="btn btn-secondary card-btn" type="button">Current Plan</button>
+                </div>
+                <div class="price-card pro-card">
+                    <div class="badge">Most Popular</div>
+                    <h3>Founder Lifetime</h3>
+                    <div class="price-zone">
+                        <span class="price">$19</span>
+                        <span class="old-price">$49</span>
+                        <span class="period">one-time payment</span>
+                    </div>
+                    <p class="card-desc">For professionals, HRs, analysts, and agency workers.</p>
+                    <ul class="features-list">
+                        <li><strong>✓ Everything in Free +</strong></li>
+                        <li>✓ Smart Reverse Mapping (De-anonymize)</li>
+                        <li>✓ Advanced Detection (Names, Credit Cards)</li>
+                        <li>✓ Custom Rules &amp; Keywords</li>
+                        <li>✓ Unlimited text &amp; Bulk processing</li>
+                        <li>✓ Future Desktop App access (Tauri)</li>
+                    </ul>
+                    <button class="btn btn-primary card-btn" type="button">Get Lifetime Access</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="cookbook" class="cookbook-section">
+            <h2 class="section-title">AI Privacy Cookbook</h2>
+            <p class="section-subtitle">Practical guides on how to use AI models without violating privacy laws or leaking internal metrics.</p>
+
+            <div class="cookbook-grid">
+                <article class="guide-card" data-guide="chatgpt-customer-data">
+                    <div class="guide-meta">SEO Guide • 3 min read</div>
+                    <h3>Can I safely use ChatGPT with customer data?</h3>
+                    <p>An honest breakdown of OpenAI's data retention policies and how to shield corporate privacy before hitting send.</p>
+                    <span class="read-more">Read Guide →</span>
+                    <div class="guide-content-hidden" aria-hidden="true">
+                        <h2>Can I safely use ChatGPT with customer data?</h2>
+                        <p>The short answer is: <strong>Not by default.</strong> When you paste raw client spreadsheets, phone numbers, or corporate emails into ChatGPT (or Claude), that data is transmitted to third-party servers. Unless you are on a strict Enterprise plan, this info can be used to train future models, leading to potential security incidents and GDPR violations.</p>
+                        <h3>The Solution: Local Anonymization</h3>
+                        <p>Instead of banning AI tools in your agency or company, the best practice is to deploy a <strong>"local gateway"</strong> approach. By replacing sensitive PII (Personally Identifiable Information) with indexed tokens like <code>[NAME_1]</code> or <code>[EMAIL_1]</code> <em>before</em> pasting, you can utilize 100% of the AI's analytical power without exposing a single byte of actual customer data.</p>
+                    </div>
+                </article>
+
+                <article class="guide-card" data-guide="hr-data-ai">
+                    <div class="guide-meta">Workflows • 4 min read</div>
+                    <h3>How to safely process HR &amp; payroll data with LLMs</h3>
+                    <p>Learn how recruiters and HR managers anonymize salaries, performance reviews, and employee profiles locally.</p>
+                    <span class="read-more">Read Guide →</span>
+                    <div class="guide-content-hidden" aria-hidden="true">
+                        <h2>How to safely process HR &amp; payroll data with LLMs</h2>
+                        <p>HR professionals frequently use AI to write review summaries, analyze compensation metrics, or draft termination letters. However, sharing salaries and full names is a direct violation of internal compliance policies.</p>
+                        <h3>Step-by-Step AI-Safe HR Workflow:</h3>
+                        <ul>
+                            <li>Copy your internal payroll spreadsheet or text log.</li>
+                            <li>Pass it through TableMask to turn actual financial metrics and names into secure custom tags (e.g., <code>[NAME_1] earns [CUSTOM_1]</code>).</li>
+                            <li>Ask ChatGPT: "Draft a compensation review based on these parameters..."</li>
+                            <li>Take the AI response, paste it into the <strong>De-anonymize</strong> tab, and restore real employee names in 1 millisecond.</li>
+                        </ul>
+                    </div>
+                </article>
+
+                <article class="guide-card" data-guide="agency-spreadsheets">
+                    <div class="guide-meta">Operations • 3 min read</div>
+                    <h3>Anonymizing client spreadsheets locally for agencies</h3>
+                    <p>A practical guide for marketing and analytics agencies handling sensitive client databases and performance logs.</p>
+                    <span class="read-more">Read Guide →</span>
+                    <div class="guide-content-hidden" aria-hidden="true">
+                        <h2>Anonymizing client spreadsheets locally for agencies</h2>
+                        <p>Agencies operate on client trust. Uploading raw customer acquisition funnels, emails, or marketing logs into LLMs risks leaking your clients' competitive advantages.</p>
+                        <h3>Why Propmt-level Masking Fails:</h3>
+                        <p>Many users try writing prompts like <em>"Please ignore the emails in this text"</em>. This is dangerous because the data has <strong>already reached the cloud server</strong>. TableMask filters CSV structures at the browser level via Web Workers, ensuring that client secrets never leave the machine.</p>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <div id="reader-modal" class="reader-modal">
+            <div class="modal-backdrop"></div>
+            <div class="modal-content">
+                <button id="close-reader" class="close-btn" type="button">✕ Close</button>
+                <div id="reader-body" class="reader-body"></div>
+            </div>
         </div>
-        <p class="tagline">Your data stays yours. Even when you share it.</p>
-    </header>
 
-    <main class="app-container">
-        <!-- Левая панель: Инпуты и Настройки -->
-        <section class="panel input-panel">
-            <div class="panel-header">
-                <h2>Raw Input</h2>
-                <div class="panel-actions">
-                    <button id="clear-btn" class="btn btn-secondary">Clear</button>
+        <section id="faq" class="faq-section">
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <h4>Are my files or text sent to any servers?</h4>
+                    <p>Never. TableMask is built on a 100% local-first architecture. All parsing, regular expressions, and masking happen directly inside your browser using Web Workers. You can literally disconnect your internet and the tool will work perfectly.</p>
                 </div>
-            </div>
-            
-            <textarea id="data-input" placeholder="Paste your text, CSV, or JSON here..." spellcheck="false"></textarea>
-            
-            <div class="settings-bar">
-                <h3>Active Filters</h3>
-                <div class="filters-grid">
-                    <label class="checkbox-container">
-                        <input type="checkbox" id="filter-email" checked>
-                        <span class="checkmark"></span> Emails
-                    </label>
-                    <label class="checkbox-container">
-                        <input type="checkbox" id="filter-phone" checked>
-                        <span class="checkmark"></span> Phones
-                    </label>
-                    <label class="checkbox-container">
-                        <input type="checkbox" id="filter-card" checked>
-                        <span class="checkmark"></span> Credit Cards
-                    </label>
-                    <label class="checkbox-container">
-                        <input type="checkbox" id="filter-ip" checked>
-                        <span class="checkmark"></span> IP Addresses
-                    </label>
-                    <label class="checkbox-container">
-                        <input type="checkbox" id="filter-name" checked>
-                        <span class="checkmark"></span> Names
-                    </label>
+                <div class="faq-item">
+                    <h4>How does the Reverse Mapping feature work?</h4>
+                    <p>When you mask data, TableMask temporarily saves a secure token map (e.g., [NAME_1] = Sarah Chen) strictly inside your browser's temporary memory (RAM). When you paste the AI response back into the de-anonymize tab, it swaps tokens back to real values. Closing the browser tab wipes this map forever.</p>
                 </div>
-                <div class="custom-rules-zone">
-                    <label for="custom-keywords" class="custom-rules-label">Custom Keywords (comma-separated)</label>
-                    <input type="text" id="custom-keywords" placeholder="e.g., Project X, Apple, Confidential, 50000">
+                <div class="faq-item">
+                    <h4>Is this compliant with GDPR and HIPAA?</h4>
+                    <p>Yes. Since zero data is transmitted, processed, or stored on our infrastructure, using TableMask effectively stops data exposure before it even reaches OpenAI or Anthropic servers, keeping your workflows compliant.</p>
+                </div>
+                <div class="faq-item">
+                    <h4>What is the refund policy for the Lifetime deal?</h4>
+                    <p>We offer a bulletproof 14-day money-back guarantee through Paddle. If TableMask doesn't fit your workflow, just drop us an email and we'll refund 100% of your purchase.</p>
                 </div>
             </div>
         </section>
 
-        <!-- Правая панель: Результат маскировки / де-анонимизации -->
-        <section class="panel output-panel">
-            <div class="panel-header">
-                <h2>Output</h2>
-                <div class="panel-actions">
-                    <button id="copy-btn" class="btn btn-primary">Copy Anonymized</button>
-                </div>
+        <footer class="app-footer">
+            <p>© 2026 Syntax Labs. All rights reserved. Your data stays yours.</p>
+            <div class="footer-links">
+                <a href="#privacy">Privacy Policy</a>
+                <a href="#terms">Terms of Service</a>
+                <a href="mailto:support@syntaxlabs.io">Support</a>
             </div>
-
-            <div class="panel-tabs">
-                <button id="tab-anonymize" class="tab-btn active" type="button">Anonymized Output</button>
-                <button id="tab-unmask" class="tab-btn" type="button">De-anonymize Response</button>
-            </div>
-
-            <div class="output-content">
-                <div id="data-output" class="output-view output-display is-active" contenteditable="false" data-placeholder="Anonymized data will appear here..."></div>
-
-                <div id="unmask-zone" class="output-view unmask-zone">
-                    <textarea id="ai-response-input" placeholder="Paste AI response with tags here (e.g. Dear [NAME_1]...)" spellcheck="false"></textarea>
-                    <div id="unmask-display" class="output-display unmask-result" contenteditable="false" data-placeholder="Restored data will appear here..."></div>
-                </div>
-            </div>
-            
-            <div class="status-bar">
-                <div class="status-left">
-                    <span id="stats-counter">0 leaks blocked</span>
-                    <span id="loading-indicator" class="loading-indicator">⚡ Processing...</span>
-                </div>
-                <span class="secure-badge">🔒 100% Local (Zero-Data-Transfer)</span>
-            </div>
-        </section>
-    </main>
+        </footer>
+    </div>
 
     <script src="js/engine.js"></script>
     <script type="module" src="js/app.js"></script>

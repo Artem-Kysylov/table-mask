@@ -42,17 +42,27 @@
     padding: 0;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     background-color: var(--bg-main);
     color: var(--text-main);
     font-family: var(--font-sans);
     font-size: 14px;
     line-height: 1.5;
-    height: 100vh;
+    height: auto;
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-font-smoothing: antialiased;
+}
+
+.landing-page {
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
 }
 
 /* 4. Шапка приложения (Header) */
@@ -63,6 +73,52 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo-link {
+    text-decoration: none;
+    color: inherit;
+    flex-shrink: 0;
+}
+
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.nav-link {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.nav-link:hover {
+    color: var(--text-main);
+    background-color: rgba(255, 255, 255, 0.04);
+}
+
+.nav-link:focus-visible {
+    outline: 2px solid var(--accent-lime);
+    outline-offset: 2px;
+}
+
+#top,
+#demo,
+#pricing,
+#cookbook,
+#faq {
+    scroll-margin-top: 72px;
 }
 
 .logo-zone {
@@ -79,7 +135,7 @@ body {
     margin-bottom: 2px;
 }
 
-.logo-zone h1 {
+.logo-zone .product-name {
     font-size: 16px;
     font-weight: 600;
     letter-spacing: -0.3px;
@@ -96,18 +152,76 @@ body {
     vertical-align: middle;
 }
 
-.tagline {
+/* 4.1 Hero Section */
+.hero-section {
+    text-align: center;
+    padding: 72px 24px 48px;
+    max-width: 860px;
+    margin: 0 auto;
+}
+
+.hero-title {
+    font-family: var(--font-sans);
+    font-size: 42px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    line-height: 1.15;
+    color: var(--text-main);
+    margin-bottom: 20px;
+}
+
+.hero-subtitle {
+    font-size: 18px;
+    line-height: 1.6;
     color: var(--text-muted);
+    max-width: 640px;
+    margin: 0 auto 32px;
+}
+
+.trust-pills {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 14px;
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
     font-size: 12px;
+    font-weight: 600;
+    color: var(--accent-lime);
+    letter-spacing: 0.2px;
+}
+
+/* 4.2 Demo Section */
+.demo-section {
+    padding: 0 20px 64px;
+    max-width: 1440px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.demo-label {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
 }
 
 /* 5. Основной Двухколоночный Лейаут */
 .app-container {
-    flex: 1;
     display: flex;
-    padding: 20px;
     gap: 20px;
-    height: calc(100vh - 69px);
+    height: 600px;
+    width: 100%;
 }
 
 .panel {
@@ -415,4 +529,469 @@ textarea::placeholder {
     background-color: var(--accent-blue-dim);
     color: var(--accent-blue);
     border-color: var(--border-blue);
+}
+
+/* 11. Landing — Shared Section Styles */
+.section-title {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    text-align: center;
+    color: var(--text-main);
+    margin-bottom: 12px;
+}
+
+.section-subtitle {
+    text-align: center;
+    font-size: 16px;
+    color: var(--text-muted);
+    max-width: 520px;
+    margin: 0 auto 48px;
+    line-height: 1.6;
+}
+
+/* 12. Pricing Section */
+.pricing-section {
+    padding: 80px 24px;
+    max-width: 960px;
+    margin: 0 auto;
+    width: 100%;
+    border-top: 1px solid var(--border-color);
+}
+
+.pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    align-items: stretch;
+}
+
+.price-card {
+    position: relative;
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+}
+
+.price-card h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--text-main);
+}
+
+.price-card .price {
+    font-size: 40px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    color: var(--text-main);
+    margin-bottom: 8px;
+}
+
+.card-desc {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+.features-list {
+    list-style: none;
+    flex: 1;
+    margin-bottom: 28px;
+}
+
+.features-list li {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.features-list li:last-child {
+    border-bottom: none;
+}
+
+.features-list li strong {
+    color: var(--text-main);
+}
+
+.card-btn {
+    width: 100%;
+    padding: 10px 16px;
+    font-size: 13px;
+}
+
+.pro-card {
+    border-color: var(--accent-lime);
+    background: linear-gradient(180deg, rgba(163, 230, 53, 0.06) 0%, var(--bg-panel) 40%);
+    box-shadow: 0 0 0 1px var(--border-lime), 0 16px 48px rgba(0, 0, 0, 0.35);
+}
+
+.pro-card .badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--accent-lime);
+    color: #111113;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.price-zone {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    margin-bottom: 8px;
+}
+
+.pro-card .price {
+    font-size: 48px;
+    color: var(--accent-lime);
+}
+
+.old-price {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.period {
+    display: block;
+    width: 100%;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* 12.1 AI Privacy Cookbook */
+.cookbook-section {
+    padding: 80px 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+    border-top: 1px solid var(--border-color);
+}
+
+.cookbook-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+}
+
+.guide-card {
+    background-color: #1e1e24;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.guide-card:hover {
+    border-color: rgba(163, 230, 53, 0.35);
+    background-color: #222228;
+    transform: translateY(-2px);
+}
+
+.guide-meta {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--accent-lime);
+    margin-bottom: 12px;
+}
+
+.guide-card h3 {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-main);
+    line-height: 1.4;
+    margin-bottom: 10px;
+}
+
+.guide-card > p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-muted);
+    flex: 1;
+    margin-bottom: 16px;
+}
+
+.read-more {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--btn-primary);
+    transition: color 0.15s ease;
+}
+
+.guide-card:hover .read-more {
+    color: #93c5fd;
+}
+
+.guide-content-hidden {
+    display: none;
+}
+
+/* Reader Modal */
+.reader-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.reader-modal.is-open {
+    display: flex;
+}
+
+.modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 700px;
+    max-height: 85vh;
+    overflow-y: auto;
+    background-color: #16161a;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 28px 32px 32px;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+}
+
+.close-btn {
+    position: sticky;
+    top: 0;
+    float: right;
+    font-family: var(--font-sans);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+    margin-bottom: 8px;
+}
+
+.close-btn:hover {
+    color: var(--text-main);
+    border-color: var(--text-muted);
+    background-color: rgba(255, 255, 255, 0.06);
+}
+
+.reader-body {
+    clear: both;
+    padding-top: 8px;
+}
+
+.reader-body h2 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--text-main);
+    line-height: 1.25;
+    margin-bottom: 20px;
+}
+
+.reader-body h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin: 28px 0 12px;
+    line-height: 1.35;
+}
+
+.reader-body p {
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+}
+
+.reader-body ul {
+    margin: 0 0 16px 20px;
+    color: var(--text-muted);
+}
+
+.reader-body li {
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 8px;
+}
+
+.reader-body strong {
+    color: var(--text-main);
+    font-weight: 600;
+}
+
+.reader-body em {
+    color: #c4c4cc;
+    font-style: italic;
+}
+
+.reader-body code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    background-color: rgba(163, 230, 53, 0.08);
+    color: var(--accent-lime);
+    border: 1px solid var(--border-lime);
+    border-radius: 4px;
+    padding: 1px 6px;
+}
+
+/* 13. FAQ Section */
+.faq-section {
+    padding: 80px 24px;
+    max-width: 960px;
+    margin: 0 auto;
+    width: 100%;
+    border-top: 1px solid var(--border-color);
+}
+
+.faq-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.faq-item {
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 24px;
+}
+
+.faq-item h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+.faq-item p {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--text-muted);
+}
+
+/* 14. Footer */
+.app-footer {
+    margin-top: auto;
+    padding: 32px 24px;
+    border-top: 1px solid var(--border-color);
+    background-color: #0e0e10;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.app-footer p {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.footer-links a {
+    color: var(--text-muted);
+    font-size: 13px;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.footer-links a:hover {
+    color: var(--text-main);
+}
+
+/* 15. Responsive */
+@media (max-width: 900px) {
+    .app-container {
+        flex-direction: column;
+        height: auto;
+        min-height: 600px;
+    }
+
+    .panel {
+        min-height: 400px;
+    }
+
+    .hero-title {
+        font-size: 32px;
+    }
+
+    .hero-subtitle {
+        font-size: 16px;
+    }
+
+    .pricing-grid,
+    .faq-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .app-header {
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .header-nav {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 540px) {
+    .hero-section {
+        padding: 48px 20px 32px;
+    }
+
+    .hero-title {
+        font-size: 28px;
+        letter-spacing: -0.5px;
+    }
+
+    .section-title {
+        font-size: 26px;
+    }
+
+    .app-footer {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }
