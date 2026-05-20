@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TableMask — Syntax Labs</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="app-header">
+        <div class="logo-zone">
+            <span class="brand">Syntax Labs</span>
+            <h1>TableMask <span class="version">v1.0</span></h1>
+        </div>
+        <p class="tagline">Your data stays yours. Even when you share it.</p>
+    </header>
+
+    <main class="app-container">
+        <!-- Левая панель: Инпуты и Настройки -->
+        <section class="panel input-panel">
+            <div class="panel-header">
+                <h2>Raw Input</h2>
+                <div class="panel-actions">
+                    <button id="clear-btn" class="btn btn-secondary">Clear</button>
+                </div>
+            </div>
+            
+            <textarea id="data-input" placeholder="Paste your text, CSV, or JSON here..." spellcheck="false"></textarea>
+            
+            <div class="settings-bar">
+                <h3>Active Filters</h3>
+                <div class="filters-grid">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="filter-email" checked>
+                        <span class="checkmark"></span> Emails
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="filter-phone" checked>
+                        <span class="checkmark"></span> Phones
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="filter-card" checked>
+                        <span class="checkmark"></span> Credit Cards
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="filter-ip" checked>
+                        <span class="checkmark"></span> IP Addresses
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="filter-name" checked>
+                        <span class="checkmark"></span> Names
+                    </label>
+                </div>
+                <div class="custom-rules-zone">
+                    <label for="custom-keywords" class="custom-rules-label">Custom Keywords (comma-separated)</label>
+                    <input type="text" id="custom-keywords" placeholder="e.g., Project X, Apple, Confidential, 50000">
+                </div>
+            </div>
+        </section>
+
+        <!-- Правая панель: Результат маскировки / де-анонимизации -->
+        <section class="panel output-panel">
+            <div class="panel-header">
+                <h2>Output</h2>
+                <div class="panel-actions">
+                    <button id="copy-btn" class="btn btn-primary">Copy Anonymized</button>
+                </div>
+            </div>
+
+            <div class="panel-tabs">
+                <button id="tab-anonymize" class="tab-btn active" type="button">Anonymized Output</button>
+                <button id="tab-unmask" class="tab-btn" type="button">De-anonymize Response</button>
+            </div>
+
+            <div class="output-content">
+                <div id="data-output" class="output-view output-display is-active" contenteditable="false" data-placeholder="Anonymized data will appear here..."></div>
+
+                <div id="unmask-zone" class="output-view unmask-zone">
+                    <textarea id="ai-response-input" placeholder="Paste AI response with tags here (e.g. Dear [NAME_1]...)" spellcheck="false"></textarea>
+                    <div id="unmask-display" class="output-display unmask-result" contenteditable="false" data-placeholder="Restored data will appear here..."></div>
+                </div>
+            </div>
+            
+            <div class="status-bar">
+                <div class="status-left">
+                    <span id="stats-counter">0 leaks blocked</span>
+                    <span id="loading-indicator" class="loading-indicator">⚡ Processing...</span>
+                </div>
+                <span class="secure-badge">🔒 100% Local (Zero-Data-Transfer)</span>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/engine.js"></script>
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
