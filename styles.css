@@ -960,6 +960,101 @@ textarea::placeholder {
     color: var(--text-main);
 }
 
+/* 16. Legal Pages */
+.legal-page {
+    min-height: 100vh;
+}
+
+.legal-content {
+    flex: 1;
+    padding-top: 56px;
+    padding-bottom: 80px;
+    max-width: 760px;
+}
+
+.legal-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--accent-lime);
+    margin-bottom: 12px;
+}
+
+.legal-title {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -0.8px;
+    color: var(--text-main);
+    margin-bottom: 10px;
+    line-height: 1.2;
+}
+
+.legal-updated {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 28px;
+}
+
+.legal-intro {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--text-muted);
+    margin-bottom: 36px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.legal-section {
+    margin-bottom: 32px;
+}
+
+.legal-section h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 12px;
+    line-height: 1.35;
+}
+
+.legal-section p {
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--text-muted);
+}
+
+.legal-list {
+    margin-top: 12px;
+    padding-left: 20px;
+    color: var(--text-muted);
+}
+
+.legal-list li {
+    font-size: 15px;
+    line-height: 1.75;
+    margin-bottom: 12px;
+}
+
+.legal-list li strong {
+    color: var(--text-main);
+    font-weight: 600;
+}
+
+.legal-link {
+    color: var(--accent-lime);
+    text-decoration: none;
+    transition: opacity 0.15s ease;
+}
+
+.legal-link:hover {
+    opacity: 0.85;
+    text-decoration: underline;
+}
+
+.footer-links a[aria-current="page"] {
+    color: var(--text-main);
+}
+
 /* 15. Responsive */
 @media (max-width: 900px) {
     .app-container {
@@ -1009,6 +1104,15 @@ textarea::placeholder {
 
     .section-title {
         font-size: 26px;
+    }
+
+    .legal-title {
+        font-size: 28px;
+    }
+
+    .legal-content {
+        padding-top: 40px;
+        padding-bottom: 56px;
     }
 
     .app-footer-inner {
