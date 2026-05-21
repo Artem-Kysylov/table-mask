@@ -15,13 +15,13 @@ const CUSTOM_KEYWORDS_STORAGE_KEY = 'tablemask_custom_keywords';
 
 let currentUser = null;
 
-function escapeHtml(text) {
-    return text
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
+function isSafeImageUrl(url) {
+    try {
+        const parsed = new URL(url);
+        return parsed.protocol === 'https:' || parsed.protocol === 'http:';
+    } catch {
+        return false;
+    }
 }
 
 function renderAuthZone(user) {
@@ -31,27 +31,40 @@ function renderAuthZone(user) {
         return;
     }
 
+    authZone.replaceChildren();
+
     if (!user) {
-        authZone.innerHTML = '';
         return;
     }
 
-    const displayName = user.displayName || user.email || 'User';
-    const photoURL = user.photoURL
-        ? `<img src="${escapeHtml(user.photoURL)}" alt="" class="user-avatar" width="32" height="32">`
-        : '';
+    const profile = document.createElement('div');
+    profile.className = 'user-profile';
 
-    authZone.innerHTML = `
-        <div class="user-profile">
-            <div class="user-info">
-                ${photoURL}
-                <span class="user-name">${escapeHtml(displayName)}</span>
-                <a href="#" class="sign-out-link">Sign out</a>
-            </div>
-        </div>
-    `;
+    const userInfo = document.createElement('div');
+    userInfo.className = 'user-info';
 
-    authZone.querySelector('.sign-out-link')?.addEventListener('click', async (event) => {
+    if (user.photoURL && isSafeImageUrl(user.photoURL)) {
+        const avatar = document.createElement('img');
+        avatar.className = 'user-avatar';
+        avatar.width = 32;
+        avatar.height = 32;
+        avatar.alt = '';
+        avatar.referrerPolicy = 'no-referrer';
+        avatar.src = user.photoURL;
+        avatar.addEventListener('error', () => avatar.remove());
+        userInfo.appendChild(avatar);
+    }
+
+    const userName = document.createElement('span');
+    userName.className = 'user-name';
+    userName.textContent = user.displayName || user.email || 'User';
+    userInfo.appendChild(userName);
+
+    const signOutLink = document.createElement('a');
+    signOutLink.href = '#';
+    signOutLink.className = 'sign-out-link';
+    signOutLink.textContent = 'Sign out';
+    signOutLink.addEventListener('click', async (event) => {
         event.preventDefault();
 
         try {
@@ -60,6 +73,10 @@ function renderAuthZone(user) {
             console.error('Sign out failed:', error);
         }
     });
+    userInfo.appendChild(signOutLink);
+
+    profile.appendChild(userInfo);
+    authZone.appendChild(profile);
 }
 
 function initAuth(checkoutBtn) {
