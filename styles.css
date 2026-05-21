@@ -30,6 +30,10 @@
     --accent-amber-dim: rgba(251, 191, 36, 0.1);
     --border-amber: rgba(251, 191, 36, 0.25);
     
+    /* Layout */
+    --page-max-width: 1200px;
+    --page-gutter: 24px;
+    
     /* Шрифтовая система */
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
@@ -65,18 +69,30 @@ body {
     min-height: 100vh;
 }
 
+.page-container {
+    max-width: var(--page-max-width);
+    margin: 0 auto;
+    width: 100%;
+    padding-left: var(--page-gutter);
+    padding-right: var(--page-gutter);
+}
+
 /* 4. Шапка приложения (Header) */
 .app-header {
-    padding: 14px 24px;
     background-color: var(--bg-panel);
     border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.app-header-inner {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 24px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    padding-top: 14px;
+    padding-bottom: 14px;
 }
 
 .logo-link {
@@ -155,9 +171,10 @@ body {
 /* 4.1 Hero Section */
 .hero-section {
     text-align: center;
-    padding: 72px 24px 48px;
-    max-width: 860px;
+    padding: 72px var(--page-gutter) 48px;
+    max-width: var(--page-max-width);
     margin: 0 auto;
+    width: 100%;
 }
 
 .hero-title {
@@ -200,8 +217,8 @@ body {
 
 /* 4.2 Demo Section */
 .demo-section {
-    padding: 0 20px 64px;
-    max-width: 1440px;
+    padding: 0 var(--page-gutter) 64px;
+    max-width: var(--page-max-width);
     margin: 0 auto;
     width: 100%;
 }
@@ -552,8 +569,8 @@ textarea::placeholder {
 
 /* 12. Pricing Section */
 .pricing-section {
-    padding: 80px 24px;
-    max-width: 960px;
+    padding: 80px var(--page-gutter);
+    max-width: var(--page-max-width);
     margin: 0 auto;
     width: 100%;
     border-top: 1px solid var(--border-color);
@@ -679,8 +696,8 @@ textarea::placeholder {
 
 /* 12.1 AI Privacy Cookbook */
 .cookbook-section {
-    padding: 80px 24px;
-    max-width: 1100px;
+    padding: 80px var(--page-gutter);
+    max-width: var(--page-max-width);
     margin: 0 auto;
     width: 100%;
     border-top: 1px solid var(--border-color);
@@ -870,8 +887,8 @@ textarea::placeholder {
 
 /* 13. FAQ Section */
 .faq-section {
-    padding: 80px 24px;
-    max-width: 960px;
+    padding: 80px var(--page-gutter);
+    max-width: var(--page-max-width);
     margin: 0 auto;
     width: 100%;
     border-top: 1px solid var(--border-color);
@@ -907,14 +924,18 @@ textarea::placeholder {
 /* 14. Footer */
 .app-footer {
     margin-top: auto;
-    padding: 32px 24px;
     border-top: 1px solid var(--border-color);
     background-color: #0e0e10;
+}
+
+.app-footer-inner {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
     gap: 16px;
+    padding-top: 32px;
+    padding-bottom: 32px;
 }
 
 .app-footer p {
@@ -964,7 +985,7 @@ textarea::placeholder {
         grid-template-columns: 1fr;
     }
 
-    .app-header {
+    .app-header-inner {
         flex-wrap: wrap;
         align-items: center;
         gap: 12px;
@@ -990,7 +1011,7 @@ textarea::placeholder {
         font-size: 26px;
     }
 
-    .app-footer {
+    .app-footer-inner {
         flex-direction: column;
         align-items: flex-start;
     }
