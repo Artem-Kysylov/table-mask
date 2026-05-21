@@ -10,6 +10,11 @@ const COPY_LABELS = {
     unmask: 'Copy Unmasked'
 };
 
+const CHECKOUT_LABELS = {
+    loggedOut: 'Get Lifetime Access',
+    loggedIn: 'Proceed to payment'
+};
+
 const DEBOUNCE_MS = 175;
 const CUSTOM_KEYWORDS_STORAGE_KEY = 'tablemask_custom_keywords';
 
@@ -79,10 +84,21 @@ function renderAuthZone(user) {
     authZone.appendChild(profile);
 }
 
+function updateCheckoutButton(checkoutBtn, user) {
+    if (!checkoutBtn) {
+        return;
+    }
+
+    checkoutBtn.textContent = user
+        ? CHECKOUT_LABELS.loggedIn
+        : CHECKOUT_LABELS.loggedOut;
+}
+
 function initAuth(checkoutBtn) {
     onAuthChange((user) => {
         currentUser = user;
         renderAuthZone(user);
+        updateCheckoutButton(checkoutBtn, user);
     });
 
     if (!checkoutBtn) {
