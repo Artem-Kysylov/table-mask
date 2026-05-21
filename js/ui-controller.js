@@ -3,6 +3,8 @@
  * Обработка событий интерфейса, синхронизация ввода/вывода и копирование
  */
 
+import { loginWithGoogle, logoutUser, onAuthChange } from './auth.js';
+
 const COPY_LABELS = {
     anonymize: 'Copy Anonymized',
     unmask: 'Copy Unmasked'
@@ -10,6 +12,84 @@ const COPY_LABELS = {
 
 const DEBOUNCE_MS = 175;
 const CUSTOM_KEYWORDS_STORAGE_KEY = 'tablemask_custom_keywords';
+
+let currentUser = null;
+
+function escapeHtml(text) {
+    return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function renderAuthZone(user) {
+    const authZone = document.getElementById('auth-zone');
+
+    if (!authZone) {
+        return;
+    }
+
+    if (!user) {
+        authZone.innerHTML = '';
+        return;
+    }
+
+    const displayName = user.displayName || user.email || 'User';
+    const photoURL = user.photoURL
+        ? `<img src="${escapeHtml(user.photoURL)}" alt="" class="user-avatar" width="32" height="32">`
+        : '';
+
+    authZone.innerHTML = `
+        <div class="user-profile">
+            <div class="user-info">
+                ${photoURL}
+                <span class="user-name">${escapeHtml(displayName)}</span>
+                <a href="#" class="sign-out-link">Sign out</a>
+            </div>
+        </div>
+    `;
+
+    authZone.querySelector('.sign-out-link')?.addEventListener('click', async (event) => {
+        event.preventDefault();
+
+        try {
+            await logoutUser();
+        } catch (error) {
+            console.error('Sign out failed:', error);
+        }
+    });
+}
+
+function initAuth(checkoutBtn) {
+    onAuthChange((user) => {
+        currentUser = user;
+        renderAuthZone(user);
+    });
+
+    if (!checkoutBtn) {
+        return;
+    }
+
+    checkoutBtn.addEventListener('click', async () => {
+        try {
+            if (!currentUser) {
+                const user = await loginWithGoogle();
+
+                if (user) {
+                    console.log(`Proceeding to checkout for ${user.email}`);
+                }
+
+                return;
+            }
+
+            console.log(`Proceeding to checkout for ${currentUser.email}`);
+        } catch (error) {
+            console.error('Authentication failed:', error);
+        }
+    });
+}
 
 export function initUI(engine) {
     const maskWorker = new Worker('worker.js');
@@ -26,6 +106,7 @@ export function initUI(engine) {
     const unmaskZone = document.getElementById('unmask-zone');
     const aiResponseInput = document.getElementById('ai-response-input');
     const unmaskDisplay = document.getElementById('unmask-display');
+    const checkoutBtn = document.querySelector('.pro-card .card-btn');
 
     const filters = {
         email: document.getElementById('filter-email'),
@@ -219,6 +300,7 @@ export function initUI(engine) {
 
     updateCopyButtonLabel();
     initCookbookReader();
+    initAuth(checkoutBtn);
 }
 
 function initCookbookReader() {
