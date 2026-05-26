@@ -30,6 +30,7 @@ const PADDLE_CONFIG = {
 
 let currentUser = null;
 let pendingCheckout = false;
+let isPaddleInitialized = false;
 
 function maybeOpenPendingCheckout(user) {
     if (!pendingCheckout) {
@@ -46,41 +47,44 @@ function maybeOpenPendingCheckout(user) {
 }
 
 function initPaddle() {
-    // Перед деплоем в продакшн замени environment на 'production' и укажи свой реальный ключ
-    if (typeof Paddle === 'undefined') {
-        console.warn('Paddle SDK not loaded');
-        return;
+    if (typeof Paddle !== 'undefined') {
+        Paddle.Environment.set(PADDLE_CONFIG.environment);
+        Paddle.Setup({ vendor: PADDLE_CONFIG.vendorId });
+        isPaddleInitialized = true;
+        console.log('⚡ Paddle SDK successfully initialized.');
+    } else {
+        console.warn('Paddle SDK object not found in window yet.');
     }
-
-    Paddle.Environment.set(PADDLE_CONFIG.environment);
-    Paddle.Setup({ vendor: PADDLE_CONFIG.vendorId });
 }
 
 function openPaddleCheckout(user) {
-    if (typeof Paddle === 'undefined') {
-        console.error('Paddle SDK not loaded');
+    if (!isPaddleInitialized) {
+        console.log('Paddle not ready yet, retrying in 200ms...');
+        setTimeout(() => openPaddleCheckout(user), 200);
         return;
     }
 
     Paddle.Checkout.open({
-        items: [
-            {
-                priceId: PADDLE_CONFIG.priceId,
-                quantity: 1
-            }
-        ],
-        customer: {
-            email: user.email
-        },
-        customData: {
-            uid: user.uid
-        },
+        items: [{ priceId: PADDLE_CONFIG.priceId, quantity: 1 }],
+        customer: { email: user.email },
+        customData: { uid: user.uid },
         settings: {
             displayMode: 'overlay',
             theme: 'dark',
             locale: 'en'
         }
     });
+}
+
+function startPaddleInitPolling() {
+    const paddlePoll = setInterval(() => {
+        if (typeof Paddle !== 'undefined') {
+            initPaddle();
+            clearInterval(paddlePoll);
+        }
+    }, 100);
+
+    setTimeout(() => clearInterval(paddlePoll), 5000);
 }
 
 function isProUser() {
@@ -258,13 +262,7 @@ function initAuth(checkoutBtn, onUserReady) {
 }
 
 export function initUI(engine) {
-    window.addEventListener('load', () => {
-        if (typeof Paddle !== 'undefined') {
-            initPaddle();
-        } else {
-            console.warn('Paddle SDK script is blocked or not loaded yet.');
-        }
-    });
+    startPaddleInitPolling();
 
     const maskWorker = new Worker('worker.js');
 
