@@ -21,15 +21,27 @@ const CUSTOM_KEYWORDS_STORAGE_KEY = 'tablemask_custom_keywords';
 const PRO_PAYWALL_MESSAGE = 'Reverse Mapping is a Pro feature. Please upgrade to Founder Lifetime to unlock.';
 const FREE_TIER_LIMIT_MESSAGE = 'Free tier limit reached (1,000 characters). Please upgrade to Pro for unlimited bulk processing.';
 
-// Paddle v2 Classic — замени перед публикацией
+// Paddle v3 Billing — замени перед публикацией
 const PADDLE_CONFIG = {
-    environment: 'sandbox', // 'sandbox' или 'production'
-    vendorId: 123456, // Paddle Seller/Vendor ID
-    productId: 'click_123' // ID продукта или плана из классической панели Paddle
+    environment: 'sandbox',
+    token: 'test_840374f72bf9a6cf51704e73527',
+    priceId: 'pri_01ksj4y39k1ehghtfhekewhdfk'
 };
 
 let currentUser = null;
 let pendingCheckout = false;
+
+function initPaddleV3() {
+    if (typeof Paddle !== 'undefined') {
+        Paddle.Environment.set(PADDLE_CONFIG.environment);
+        Paddle.Initialize({
+            token: PADDLE_CONFIG.token
+        });
+        console.log('⚡ Paddle v3 Billing успешно инициализирован.');
+    }
+}
+
+initPaddleV3();
 
 function maybeOpenPendingCheckout(user) {
     if (!pendingCheckout) {
@@ -45,28 +57,30 @@ function maybeOpenPendingCheckout(user) {
     openPaddleCheckout(user);
 }
 
-function initPaddle() {
-    if (typeof Paddle !== 'undefined') {
-        if (PADDLE_CONFIG.environment === 'sandbox') {
-            Paddle.Environment.set('sandbox');
-        }
-        Paddle.Setup({ vendor: PADDLE_CONFIG.vendorId });
-        console.log('⚡ Paddle v2 Classic initialized.');
-    }
-}
-
 function openPaddleCheckout(user) {
     if (typeof Paddle === 'undefined') {
-        console.error('Paddle SDK not loaded.');
+        console.error('Paddle SDK не загружен.');
         return;
     }
 
     Paddle.Checkout.open({
-        product: PADDLE_CONFIG.productId,
-        email: user.email,
-        passthrough: JSON.stringify({ uid: user.uid }),
-        method: 'buy',
-        displayMode: 'overlay'
+        settings: {
+            displayMode: 'overlay',
+            theme: 'dark',
+            locale: 'en'
+        },
+        items: [
+            {
+                priceId: PADDLE_CONFIG.priceId,
+                quantity: 1
+            }
+        ],
+        customer: {
+            email: user.email
+        },
+        customData: {
+            uid: user.uid
+        }
     });
 }
 
@@ -245,8 +259,6 @@ function initAuth(checkoutBtn, onUserReady) {
 }
 
 export function initUI(engine) {
-    initPaddle();
-
     const maskWorker = new Worker('worker.js');
 
     const dataInput = document.getElementById('data-input');
