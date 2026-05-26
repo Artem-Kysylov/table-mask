@@ -258,7 +258,13 @@ function initAuth(checkoutBtn, onUserReady) {
 }
 
 export function initUI(engine) {
-    initPaddle();
+    window.addEventListener('load', () => {
+        if (typeof Paddle !== 'undefined') {
+            initPaddle();
+        } else {
+            console.warn('Paddle SDK script is blocked or not loaded yet.');
+        }
+    });
 
     const maskWorker = new Worker('worker.js');
 
