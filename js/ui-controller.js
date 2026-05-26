@@ -21,7 +21,7 @@ const CUSTOM_KEYWORDS_STORAGE_KEY = 'tablemask_custom_keywords';
 const PRO_PAYWALL_MESSAGE = 'Reverse Mapping is a Pro feature. Please upgrade to Founder Lifetime to unlock.';
 const FREE_TIER_LIMIT_MESSAGE = 'Free tier limit reached (1,000 characters). Please upgrade to Pro for unlimited bulk processing.';
 
-// Paddle v3 Billing — замени перед публикацией
+// Paddle v3 Billing
 const PADDLE_CONFIG = {
     environment: 'sandbox',
     token: 'test_840374f72bf9a6cf51704e73527',
@@ -66,7 +66,7 @@ function maybeOpenPendingCheckout(user) {
 
 function openPaddleCheckout(user) {
     if (!isPaddleReady) {
-        console.log('Паддл ещё заряжается, повтор через 200мс...');
+        console.log('Paddle ещё загружается, повтор через 200мс...');
         setTimeout(() => openPaddleCheckout(user), 200);
         return;
     }
