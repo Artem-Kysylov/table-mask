@@ -30,18 +30,25 @@ const PADDLE_CONFIG = {
 
 let currentUser = null;
 let pendingCheckout = false;
+let isPaddleReady = false;
 
 function initPaddleV3() {
     if (typeof Paddle !== 'undefined') {
         Paddle.Environment.set(PADDLE_CONFIG.environment);
-        Paddle.Initialize({
-            token: PADDLE_CONFIG.token
-        });
-        console.log('⚡ Paddle v3 Billing успешно инициализирован.');
+        Paddle.Initialize({ token: PADDLE_CONFIG.token });
+        isPaddleReady = true;
+        console.log('⚡ Paddle v3 успешно запущен и готов.');
     }
 }
 
-initPaddleV3();
+const waitForPaddle = setInterval(() => {
+    if (typeof Paddle !== 'undefined') {
+        initPaddleV3();
+        clearInterval(waitForPaddle);
+    }
+}, 100);
+
+setTimeout(() => clearInterval(waitForPaddle), 5000);
 
 function maybeOpenPendingCheckout(user) {
     if (!pendingCheckout) {
@@ -58,8 +65,9 @@ function maybeOpenPendingCheckout(user) {
 }
 
 function openPaddleCheckout(user) {
-    if (typeof Paddle === 'undefined') {
-        console.error('Paddle SDK не загружен.');
+    if (!isPaddleReady) {
+        console.log('Паддл ещё заряжается, повтор через 200мс...');
+        setTimeout(() => openPaddleCheckout(user), 200);
         return;
     }
 
@@ -69,18 +77,9 @@ function openPaddleCheckout(user) {
             theme: 'dark',
             locale: 'en'
         },
-        items: [
-            {
-                priceId: PADDLE_CONFIG.priceId,
-                quantity: 1
-            }
-        ],
-        customer: {
-            email: user.email
-        },
-        customData: {
-            uid: user.uid
-        }
+        items: [{ priceId: PADDLE_CONFIG.priceId, quantity: 1 }],
+        customer: { email: user.email },
+        customData: { uid: user.uid }
     });
 }
 
