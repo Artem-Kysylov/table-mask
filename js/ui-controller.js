@@ -21,7 +21,67 @@ const CUSTOM_KEYWORDS_STORAGE_KEY = 'tablemask_custom_keywords';
 const PRO_PAYWALL_MESSAGE = 'Reverse Mapping is a Pro feature. Please upgrade to Founder Lifetime to unlock.';
 const FREE_TIER_LIMIT_MESSAGE = 'Free tier limit reached (1,000 characters). Please upgrade to Pro for unlimited bulk processing.';
 
+// Paddle Billing v3 — замени перед публикацией
+const PADDLE_CONFIG = {
+    environment: 'sandbox', // 'production' для продакшна
+    vendorId: 123456, // Paddle Seller/Vendor ID
+    priceId: 'pri_xxxxxxxxxxxxxx' // Price ID из админки Paddle
+};
+
 let currentUser = null;
+let pendingCheckout = false;
+
+function maybeOpenPendingCheckout(user) {
+    if (!pendingCheckout) {
+        return;
+    }
+
+    pendingCheckout = false;
+
+    if (!user || user.isPro) {
+        return;
+    }
+
+    openPaddleCheckout(user);
+}
+
+function initPaddle() {
+    // Перед деплоем в продакшн замени environment на 'production' и укажи свой реальный ключ
+    if (typeof Paddle === 'undefined') {
+        console.warn('Paddle SDK not loaded');
+        return;
+    }
+
+    Paddle.Environment.set(PADDLE_CONFIG.environment);
+    Paddle.Setup({ vendor: PADDLE_CONFIG.vendorId });
+}
+
+function openPaddleCheckout(user) {
+    if (typeof Paddle === 'undefined') {
+        console.error('Paddle SDK not loaded');
+        return;
+    }
+
+    Paddle.Checkout.open({
+        items: [
+            {
+                priceId: PADDLE_CONFIG.priceId,
+                quantity: 1
+            }
+        ],
+        customer: {
+            email: user.email
+        },
+        customData: {
+            uid: user.uid
+        },
+        settings: {
+            displayMode: 'overlay',
+            theme: 'dark',
+            locale: 'en'
+        }
+    });
+}
 
 function isProUser() {
     return currentUser?.isPro === true;
@@ -163,6 +223,7 @@ function initAuth(checkoutBtn, onUserReady) {
         currentUser = user;
         renderAuthZone(user);
         updateCheckoutButton(checkoutBtn, user);
+        maybeOpenPendingCheckout(user);
         onUserReady?.(user);
     });
 
@@ -172,24 +233,33 @@ function initAuth(checkoutBtn, onUserReady) {
 
     checkoutBtn.addEventListener('click', async () => {
         try {
-            if (!currentUser) {
-                const user = await loginWithGoogle();
+            if (currentUser?.isPro) {
+                return;
+            }
 
-                if (user) {
-                    console.log(`Proceeding to checkout for ${user.email}`);
+            if (!currentUser) {
+                pendingCheckout = true;
+
+                try {
+                    await loginWithGoogle();
+                } catch (error) {
+                    pendingCheckout = false;
+                    throw error;
                 }
 
                 return;
             }
 
-            console.log(`Proceeding to checkout for ${currentUser.email}`);
+            openPaddleCheckout(currentUser);
         } catch (error) {
-            console.error('Authentication failed:', error);
+            console.error('Checkout failed:', error);
         }
     });
 }
 
 export function initUI(engine) {
+    initPaddle();
+
     const maskWorker = new Worker('worker.js');
 
     const dataInput = document.getElementById('data-input');
