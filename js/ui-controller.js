@@ -21,16 +21,15 @@ const CUSTOM_KEYWORDS_STORAGE_KEY = 'tablemask_custom_keywords';
 const PRO_PAYWALL_MESSAGE = 'Reverse Mapping is a Pro feature. Please upgrade to Founder Lifetime to unlock.';
 const FREE_TIER_LIMIT_MESSAGE = 'Free tier limit reached (1,000 characters). Please upgrade to Pro for unlimited bulk processing.';
 
-// Paddle Billing v3 — замени перед публикацией
+// Paddle v2 Classic — замени перед публикацией
 const PADDLE_CONFIG = {
-    environment: 'sandbox', // 'production' для продакшна
+    environment: 'sandbox', // 'sandbox' или 'production'
     vendorId: 123456, // Paddle Seller/Vendor ID
-    priceId: 'pri_xxxxxxxxxxxxxx' // Price ID из админки Paddle
+    productId: 'click_123' // ID продукта или плана из классической панели Paddle
 };
 
 let currentUser = null;
 let pendingCheckout = false;
-let isPaddleInitialized = false;
 
 function maybeOpenPendingCheckout(user) {
     if (!pendingCheckout) {
@@ -48,43 +47,27 @@ function maybeOpenPendingCheckout(user) {
 
 function initPaddle() {
     if (typeof Paddle !== 'undefined') {
-        Paddle.Environment.set(PADDLE_CONFIG.environment);
+        if (PADDLE_CONFIG.environment === 'sandbox') {
+            Paddle.Environment.set('sandbox');
+        }
         Paddle.Setup({ vendor: PADDLE_CONFIG.vendorId });
-        isPaddleInitialized = true;
-        console.log('⚡ Paddle SDK successfully initialized.');
-    } else {
-        console.warn('Paddle SDK object not found in window yet.');
+        console.log('⚡ Paddle v2 Classic initialized.');
     }
 }
 
 function openPaddleCheckout(user) {
-    if (!isPaddleInitialized) {
-        console.log('Paddle not ready yet, retrying in 200ms...');
-        setTimeout(() => openPaddleCheckout(user), 200);
+    if (typeof Paddle === 'undefined') {
+        console.error('Paddle SDK not loaded.');
         return;
     }
 
     Paddle.Checkout.open({
-        items: [{ priceId: PADDLE_CONFIG.priceId, quantity: 1 }],
-        customer: { email: user.email },
-        customData: { uid: user.uid },
-        settings: {
-            displayMode: 'overlay',
-            theme: 'dark',
-            locale: 'en'
-        }
+        product: PADDLE_CONFIG.productId,
+        email: user.email,
+        passthrough: JSON.stringify({ uid: user.uid }),
+        method: 'buy',
+        displayMode: 'overlay'
     });
-}
-
-function startPaddleInitPolling() {
-    const paddlePoll = setInterval(() => {
-        if (typeof Paddle !== 'undefined') {
-            initPaddle();
-            clearInterval(paddlePoll);
-        }
-    }, 100);
-
-    setTimeout(() => clearInterval(paddlePoll), 5000);
 }
 
 function isProUser() {
@@ -262,7 +245,7 @@ function initAuth(checkoutBtn, onUserReady) {
 }
 
 export function initUI(engine) {
-    startPaddleInitPolling();
+    initPaddle();
 
     const maskWorker = new Worker('worker.js');
 
