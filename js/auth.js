@@ -3,6 +3,7 @@
  * Firebase Auth (Google Sign-In) via ESM CDN
  */
 
+import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js';
 import {
     getAuth,
@@ -22,6 +23,7 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app);
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 
@@ -38,4 +40,23 @@ function onAuthChange(callback) {
     return onAuthStateChanged(auth, callback);
 }
 
-export { auth, loginWithGoogle, logoutUser, onAuthChange };
+async function syncUserInDatabase(user) {
+    const userRef = doc(db, 'users', user.uid);
+    const docSnap = await getDoc(userRef);
+
+    if (docSnap.exists()) {
+        return docSnap.data();
+    }
+
+    const newUser = {
+        uid: user.uid,
+        email: user.email,
+        createdAt: new Date().toISOString(),
+        isPro: false
+    };
+
+    await setDoc(userRef, newUser);
+    return newUser;
+}
+
+export { auth, loginWithGoogle, logoutUser, onAuthChange, syncUserInDatabase };

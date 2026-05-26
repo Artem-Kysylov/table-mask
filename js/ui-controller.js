@@ -3,7 +3,7 @@
  * Обработка событий интерфейса, синхронизация ввода/вывода и копирование
  */
 
-import { loginWithGoogle, logoutUser, onAuthChange } from './auth.js';
+import { loginWithGoogle, logoutUser, onAuthChange, syncUserInDatabase } from './auth.js';
 
 const COPY_LABELS = {
     anonymize: 'Copy Anonymized',
@@ -16,9 +16,54 @@ const CHECKOUT_LABELS = {
 };
 
 const DEBOUNCE_MS = 175;
+const FREE_TIER_CHAR_LIMIT = 1000;
 const CUSTOM_KEYWORDS_STORAGE_KEY = 'tablemask_custom_keywords';
+const PRO_PAYWALL_MESSAGE = 'Reverse Mapping is a Pro feature. Please upgrade to Founder Lifetime to unlock.';
+const FREE_TIER_LIMIT_MESSAGE = 'Free tier limit reached (1,000 characters). Please upgrade to Pro for unlimited bulk processing.';
 
 let currentUser = null;
+
+function isProUser() {
+    return currentUser?.isPro === true;
+}
+
+function showProFeatureModal(message) {
+    let modal = document.getElementById('pro-feature-modal');
+
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'pro-feature-modal';
+        modal.className = 'reader-modal';
+        modal.innerHTML = `
+            <div class="modal-backdrop"></div>
+            <div class="modal-content" style="max-width: 480px; text-align: center;">
+                <button class="close-btn" type="button">✕ Close</button>
+                <p id="pro-modal-message" style="clear: both; padding-top: 24px; color: var(--text-main); font-size: 16px; line-height: 1.6;"></p>
+                <a href="#pricing" class="btn btn-primary" style="display: inline-block; margin-top: 20px; text-decoration: none;">View Pricing</a>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        const closeModal = () => {
+            modal.classList.remove('is-open');
+            document.body.style.overflow = '';
+        };
+
+        modal.querySelector('.close-btn').addEventListener('click', closeModal);
+        modal.querySelector('.modal-backdrop').addEventListener('click', closeModal);
+        modal.querySelector('a[href="#pricing"]').addEventListener('click', closeModal);
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && modal.classList.contains('is-open')) {
+                closeModal();
+            }
+        });
+    }
+
+    modal.querySelector('#pro-modal-message').textContent = message;
+    modal.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+}
 
 function isSafeImageUrl(url) {
     try {
@@ -89,16 +134,36 @@ function updateCheckoutButton(checkoutBtn, user) {
         return;
     }
 
+    if (user?.isPro === true) {
+        checkoutBtn.textContent = 'You have Active Pro';
+        checkoutBtn.disabled = true;
+        checkoutBtn.classList.add('is-pro-active');
+        return;
+    }
+
+    checkoutBtn.disabled = false;
+    checkoutBtn.classList.remove('is-pro-active');
     checkoutBtn.textContent = user
         ? CHECKOUT_LABELS.loggedIn
         : CHECKOUT_LABELS.loggedOut;
 }
 
-function initAuth(checkoutBtn) {
-    onAuthChange((user) => {
+function initAuth(checkoutBtn, onUserReady) {
+    onAuthChange(async (user) => {
+        if (user) {
+            try {
+                const dbUser = await syncUserInDatabase(user);
+                user.isPro = dbUser ? dbUser.isPro : false;
+            } catch (error) {
+                console.error('Failed to sync user profile:', error);
+                user.isPro = false;
+            }
+        }
+
         currentUser = user;
         renderAuthZone(user);
         updateCheckoutButton(checkoutBtn, user);
+        onUserReady?.(user);
     });
 
     if (!checkoutBtn) {
@@ -211,6 +276,28 @@ export function initUI(engine) {
         }
     }
 
+    function showFreeTierLimitNotice() {
+        hideLoading();
+        engine.clearSession();
+        dataOutput.replaceChildren();
+
+        const notice = document.createElement('p');
+        notice.textContent = FREE_TIER_LIMIT_MESSAGE;
+        notice.style.cssText = [
+            'color: var(--accent-amber)',
+            'padding: 16px',
+            'margin: 0',
+            'font-size: 14px',
+            'line-height: 1.5',
+            'border: 1px solid var(--border-color)',
+            'border-radius: 8px',
+            'background: var(--accent-amber-dim)'
+        ].join('; ');
+        dataOutput.appendChild(notice);
+        maskedPlainCache = '';
+        statsCounter.textContent = '0 leaks blocked';
+    }
+
     function scheduleProcessing() {
         clearTimeout(debounceTimer);
 
@@ -221,6 +308,12 @@ export function initUI(engine) {
 
             if (!rawText) {
                 resetProcessingOutput();
+                return;
+            }
+
+            if (!isProUser() && rawText.length > FREE_TIER_CHAR_LIMIT) {
+                latestRequestId += 1;
+                showFreeTierLimitNotice();
                 return;
             }
 
@@ -280,7 +373,14 @@ export function initUI(engine) {
     });
 
     tabAnonymize.addEventListener('click', () => switchTab('anonymize'));
-    tabUnmask.addEventListener('click', () => switchTab('unmask'));
+    tabUnmask.addEventListener('click', () => {
+        if (!isProUser()) {
+            showProFeatureModal(PRO_PAYWALL_MESSAGE);
+            return;
+        }
+
+        switchTab('unmask');
+    });
     aiResponseInput.addEventListener('input', handleUnmasking);
 
     clearBtn.addEventListener('click', () => {
@@ -333,7 +433,11 @@ export function initUI(engine) {
 
     updateCopyButtonLabel();
     initCookbookReader();
-    initAuth(checkoutBtn);
+    initAuth(checkoutBtn, () => {
+        if (dataInput.value) {
+            scheduleProcessing();
+        }
+    });
 }
 
 function initCookbookReader() {
