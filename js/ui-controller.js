@@ -24,9 +24,9 @@ const FREE_TIER_LIMIT_MESSAGE = 'Free tier limit reached (1,000 characters). Ple
 
 // Paddle v3 Billing
 const PADDLE_CONFIG = {
-    environment: 'sandbox',
-    token: 'test_840374f72bf9a6cf51704e73527',
-    priceId: 'pri_01ksj4y39k1ehghtfhekewhdfk'
+    environment: 'production',
+    token: 'live_da6aeff36419dd0a5148263e095',
+    priceId: 'pri_01ksjgnnktm1dh2e6axrbxm45b'
 };
 
 let currentUser = null;
