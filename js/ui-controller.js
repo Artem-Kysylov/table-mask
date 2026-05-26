@@ -12,7 +12,8 @@ const COPY_LABELS = {
 
 const CHECKOUT_LABELS = {
     loggedOut: 'Get Lifetime Access',
-    loggedIn: 'Proceed to payment'
+    loggedIn: 'Proceed to payment',
+    proActive: 'Pro Lifetime Activated 💎'
 };
 
 const DEBOUNCE_MS = 175;
@@ -35,10 +36,28 @@ let isPaddleReady = false;
 function initPaddleV3() {
     if (typeof Paddle !== 'undefined') {
         Paddle.Environment.set(PADDLE_CONFIG.environment);
-        Paddle.Initialize({ token: PADDLE_CONFIG.token });
+        Paddle.Initialize({
+            token: PADDLE_CONFIG.token,
+            eventCallback: (event) => {
+                if (event.name === 'checkout.completed') {
+                    handleCheckoutSuccess();
+                }
+            }
+        });
         isPaddleReady = true;
         console.log('⚡ Paddle v3 успешно запущен и готов.');
     }
+}
+
+function handleCheckoutSuccess() {
+    if (currentUser) {
+        currentUser.isPro = true;
+    }
+
+    updateCheckoutButton(
+        document.querySelector('.pro-card .card-btn'),
+        currentUser
+    );
 }
 
 const waitForPaddle = setInterval(() => {
@@ -195,7 +214,7 @@ function updateCheckoutButton(checkoutBtn, user) {
     }
 
     if (user?.isPro === true) {
-        checkoutBtn.textContent = 'You have Active Pro';
+        checkoutBtn.textContent = CHECKOUT_LABELS.proActive;
         checkoutBtn.disabled = true;
         checkoutBtn.classList.add('is-pro-active');
         return;
