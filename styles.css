@@ -18,13 +18,10 @@
     --accent-lime: #a3e635;
     --accent-lime-dim: rgba(163, 230, 53, 0.1);
     --border-lime: rgba(163, 230, 53, 0.25);
+    --accent-lime-hover: #84cc16;
     
-    --btn-primary: #2563eb;
-    --btn-primary-hover: #1d4ed8;
-
-    --accent-blue: #60a5fa;
-    --accent-blue-dim: rgba(59, 130, 246, 0.1);
-    --border-blue: rgba(59, 130, 246, 0.25);
+    --btn-primary: var(--accent-lime);
+    --btn-primary-hover: var(--accent-lime-hover);
 
     --accent-amber: #fbbf24;
     --accent-amber-dim: rgba(251, 191, 36, 0.1);
@@ -194,35 +191,10 @@ body {
     scroll-margin-top: 72px;
 }
 
-.logo-zone {
-    display: flex;
-    flex-direction: column;
-}
-
-.brand {
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--text-muted);
-    margin-bottom: 2px;
-}
-
-.logo-zone .product-name {
-    font-size: 16px;
-    font-weight: 600;
-    letter-spacing: -0.3px;
-}
-
-.version {
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--accent-lime);
-    background-color: var(--accent-lime-dim);
-    padding: 1px 5px;
-    border-radius: 4px;
-    margin-left: 4px;
-    vertical-align: middle;
+.site-logo {
+    display: block;
+    height: 25px;
+    width: auto;
 }
 
 /* 4.1 Hero Section */
@@ -264,7 +236,7 @@ body {
     align-items: center;
     padding: 8px 14px;
     background-color: var(--bg-panel);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-lime);
     border-radius: 999px;
     font-size: 12px;
     font-weight: 600;
@@ -511,7 +483,7 @@ textarea::placeholder {
 
 .loading-indicator {
     display: none;
-    color: var(--btn-primary);
+    color: var(--accent-lime);
     font-weight: 600;
 }
 
@@ -538,11 +510,18 @@ textarea::placeholder {
 
 .btn-primary {
     background-color: var(--btn-primary);
-    color: #ffffff;
+    color: var(--bg-main);
 }
 
 .btn-primary:hover {
     background-color: var(--btn-primary-hover);
+    color: var(--bg-main);
+}
+
+.btn-primary:focus-visible {
+    outline: 2px solid var(--accent-lime);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px var(--accent-lime-dim);
 }
 
 .btn-secondary {
@@ -600,9 +579,9 @@ textarea::placeholder {
 }
 
 .mask-tag[data-type="custom"] {
-    background-color: var(--accent-blue-dim);
-    color: var(--accent-blue);
-    border-color: var(--border-blue);
+    background-color: var(--accent-lime-dim);
+    color: var(--accent-lime);
+    border-color: var(--border-lime);
 }
 
 /* 11. Landing — Shared Section Styles */
@@ -811,12 +790,12 @@ textarea::placeholder {
 .read-more {
     font-size: 13px;
     font-weight: 600;
-    color: var(--btn-primary);
+    color: var(--accent-lime);
     transition: color 0.15s ease;
 }
 
 .guide-card:hover .read-more {
-    color: #93c5fd;
+    color: var(--accent-lime-hover);
 }
 
 .guide-content-hidden {
