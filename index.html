@@ -5,18 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TableMask — Safe AI Workflows for Sensitive Data | Syntax Labs</title>
     <meta name="description" content="Mask names, emails, salaries, and internal info locally in your browser before sharing data with AI tools.">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Syntax Labs">
+    <meta name="theme-color" content="#111113">
+    <link rel="canonical" href="https://tablemask.syntaxlabsapp.com/">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <meta property="og:type" content="website">
+    <meta property="og:url" content="https://tablemask.syntaxlabsapp.com/">
+    <meta property="og:site_name" content="TableMask">
+    <meta property="og:locale" content="en_US">
     <meta property="og:title" content="TableMask — Safe AI Workflows for Sensitive Data">
     <meta property="og:description" content="Mask names, emails, salaries, and internal info locally in your browser before sharing data with AI tools.">
-    <meta property="og:image" content="open-graph.png">
+    <meta property="og:image" content="https://tablemask.syntaxlabsapp.com/open-graph.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="TableMask — paste into ChatGPT without exposing client data">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="TableMask — Safe AI Workflows for Sensitive Data">
     <meta name="twitter:description" content="Mask names, emails, salaries, and internal info locally in your browser before sharing data with AI tools.">
-    <meta name="twitter:image" content="open-graph.png">
+    <meta name="twitter:image" content="https://tablemask.syntaxlabsapp.com/open-graph.png">
     <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -133,35 +140,41 @@
             <h2 class="section-title">Simple, Transparent Pricing</h2>
             <p class="section-subtitle">Protect your company and client data without recurring monthly fees.</p>
             <div class="pricing-grid">
-                <div class="price-card">
-                    <h3>Free Plan</h3>
-                    <div class="price">$0</div>
-                    <p class="card-desc">Perfect for quick, basic text masking.</p>
+                <div class="price-card year-pass-card">
+                    <h3>1-Year Pass</h3>
+                    <div class="price-zone">
+                        <span class="price">$19</span>
+                        <span class="period">per year</span>
+                    </div>
+                    <p class="card-desc">Unlimited export and copy for 12 months. Core detectors included.</p>
                     <ul class="features-list">
                         <li>✓ Basic PII Masking (Emails, IPs)</li>
-                        <li>✓ Up to 1,000 characters per paste</li>
+                        <li>✓ Unlimited export &amp; copy</li>
                         <li>✓ 100% Local processing</li>
+                        <li>✓ Valid for 12 months</li>
                     </ul>
-                    <button class="btn btn-secondary card-btn" type="button">Current Plan</button>
+                    <button class="btn btn-secondary card-btn js-annual-btn" type="button">Get 1-Year Pass</button>
+                    <button class="pricing-restore-link js-pricing-sign-in" type="button">Already purchased? Sign in to restore access</button>
                 </div>
                 <div class="price-card pro-card">
                     <div class="badge">Most Popular</div>
-                    <h3>Founder Lifetime</h3>
+                    <h3>Pro Lifetime Access</h3>
                     <div class="price-zone">
-                        <span class="price">$19</span>
+                        <span class="price">$29</span>
                         <span class="old-price">$49</span>
                         <span class="period">one-time payment</span>
                     </div>
-                    <p class="card-desc">For professionals, HRs, analysts, and agency workers.</p>
+                    <p class="card-desc">For professionals, HRs, analysts, and agency workers who want it all.</p>
                     <ul class="features-list">
-                        <li><strong>✓ Everything in Free +</strong></li>
+                        <li><strong>✓ Everything in 1-Year Pass +</strong></li>
                         <li>✓ Smart Reverse Mapping (De-anonymize)</li>
                         <li>✓ Advanced Detection (Names, Credit Cards)</li>
                         <li>✓ Custom Rules &amp; Keywords</li>
                         <li>✓ Unlimited text &amp; Bulk processing</li>
-                        <li>✓ Future Desktop App access (Tauri)</li>
+                        <li>✓ Future Desktop App (Tauri) — free forever</li>
                     </ul>
-                    <button class="btn btn-primary card-btn" type="button">Get Lifetime Access</button>
+                    <button id="lifetime-checkout-btn" class="btn card-btn lifetime-btn" type="button">Get Lifetime Access</button>
+                    <button class="pricing-restore-link js-pricing-sign-in" type="button">Already purchased? Sign in to restore access</button>
                 </div>
             </div>
         </section>
@@ -216,6 +229,17 @@
                 </article>
             </div>
         </section>
+
+        <div id="paywall-modal" class="paywall-modal" role="dialog" aria-modal="true" aria-labelledby="paywall-title">
+            <div class="modal-backdrop paywall-backdrop"></div>
+            <div class="paywall-dialog">
+                <button class="close-btn paywall-close" type="button" aria-label="Close">✕ Close</button>
+                <div class="paywall-lock-icon" aria-hidden="true">🔒</div>
+                <h2 id="paywall-title" class="paywall-title">Pro Feature</h2>
+                <p class="paywall-body">To download your fully masked, data-compliant file or copy the bulk output, please unlock a premium plan. Your sensitive data never leaves your browser's memory.</p>
+                <button class="paywall-cta" type="button">View Premium Plans</button>
+            </div>
+        </div>
 
         <div id="reader-modal" class="reader-modal">
             <div class="modal-backdrop"></div>

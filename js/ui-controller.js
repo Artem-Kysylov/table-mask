@@ -17,10 +17,7 @@ const CHECKOUT_LABELS = {
 };
 
 const DEBOUNCE_MS = 175;
-const FREE_TIER_CHAR_LIMIT = 1000;
 const CUSTOM_KEYWORDS_STORAGE_KEY = 'tablemask_custom_keywords';
-const PRO_PAYWALL_MESSAGE = 'Reverse Mapping is a Pro feature. Please upgrade to Founder Lifetime to unlock.';
-const FREE_TIER_LIMIT_MESSAGE = 'Free tier limit reached (1,000 characters). Please upgrade to Pro for unlimited bulk processing.';
 
 // Paddle v3 Billing
 const PADDLE_CONFIG = {
@@ -55,7 +52,7 @@ function handleCheckoutSuccess() {
     }
 
     updateCheckoutButton(
-        document.querySelector('.pro-card .card-btn'),
+        document.getElementById('lifetime-checkout-btn'),
         currentUser
     );
 }
@@ -106,42 +103,42 @@ function isProUser() {
     return currentUser?.isPro === true;
 }
 
-function showProFeatureModal(message) {
-    let modal = document.getElementById('pro-feature-modal');
-
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'pro-feature-modal';
-        modal.className = 'reader-modal';
-        modal.innerHTML = `
-            <div class="modal-backdrop"></div>
-            <div class="modal-content" style="max-width: 480px; text-align: center;">
-                <button class="close-btn" type="button">✕ Close</button>
-                <p id="pro-modal-message" style="clear: both; padding-top: 24px; color: var(--text-main); font-size: 16px; line-height: 1.6;"></p>
-                <a href="#pricing" class="btn btn-primary" style="display: inline-block; margin-top: 20px; text-decoration: none;">View Pricing</a>
-            </div>
-        `;
-        document.body.appendChild(modal);
-
-        const closeModal = () => {
-            modal.classList.remove('is-open');
-            document.body.style.overflow = '';
-        };
-
-        modal.querySelector('.close-btn').addEventListener('click', closeModal);
-        modal.querySelector('.modal-backdrop').addEventListener('click', closeModal);
-        modal.querySelector('a[href="#pricing"]').addEventListener('click', closeModal);
-
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape' && modal.classList.contains('is-open')) {
-                closeModal();
-            }
-        });
-    }
-
-    modal.querySelector('#pro-modal-message').textContent = message;
+function openTableMaskPaywall() {
+    const modal = document.getElementById('paywall-modal');
+    if (!modal) return;
     modal.classList.add('is-open');
     document.body.style.overflow = 'hidden';
+}
+
+function closePaywallModal() {
+    const modal = document.getElementById('paywall-modal');
+    if (!modal) return;
+    modal.classList.remove('is-open');
+    document.body.style.overflow = '';
+}
+
+function initPaywallModal() {
+    const modal = document.getElementById('paywall-modal');
+    if (!modal) return;
+
+    const closeBtn = modal.querySelector('.paywall-close');
+    const backdrop = modal.querySelector('.paywall-backdrop');
+    const ctaBtn = modal.querySelector('.paywall-cta');
+
+    const close = () => closePaywallModal();
+
+    closeBtn?.addEventListener('click', close);
+    backdrop?.addEventListener('click', close);
+    ctaBtn?.addEventListener('click', () => {
+        close();
+        document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && modal.classList.contains('is-open')) {
+            close();
+        }
+    });
 }
 
 function isSafeImageUrl(url) {
@@ -163,6 +160,18 @@ function renderAuthZone(user) {
     authZone.replaceChildren();
 
     if (!user) {
+        const signInBtn = document.createElement('button');
+        signInBtn.type = 'button';
+        signInBtn.className = 'sign-in-btn';
+        signInBtn.textContent = 'Sign in';
+        signInBtn.addEventListener('click', async () => {
+            try {
+                await loginWithGoogle();
+            } catch (error) {
+                console.error('Sign in failed:', error);
+            }
+        });
+        authZone.appendChild(signInBtn);
         return;
     }
 
@@ -208,6 +217,28 @@ function renderAuthZone(user) {
     authZone.appendChild(profile);
 }
 
+function updatePricingRestoreLinks(user) {
+    const showLink = !user;
+
+    document.querySelectorAll('.js-pricing-sign-in').forEach((link) => {
+        link.hidden = !showLink;
+    });
+}
+
+async function handlePricingSignIn() {
+    try {
+        await loginWithGoogle();
+    } catch (error) {
+        console.error('Sign in failed:', error);
+    }
+}
+
+function initPricingRestoreLinks() {
+    document.querySelectorAll('.js-pricing-sign-in').forEach((link) => {
+        link.addEventListener('click', handlePricingSignIn);
+    });
+}
+
 function updateCheckoutButton(checkoutBtn, user) {
     if (!checkoutBtn) {
         return;
@@ -242,6 +273,7 @@ function initAuth(checkoutBtn, onUserReady) {
         currentUser = user;
         renderAuthZone(user);
         updateCheckoutButton(checkoutBtn, user);
+        updatePricingRestoreLinks(user);
         maybeOpenPendingCheckout(user);
         onUserReady?.(user);
     });
@@ -291,7 +323,7 @@ export function initUI(engine) {
     const unmaskZone = document.getElementById('unmask-zone');
     const aiResponseInput = document.getElementById('ai-response-input');
     const unmaskDisplay = document.getElementById('unmask-display');
-    const checkoutBtn = document.querySelector('.pro-card .card-btn');
+    const checkoutBtn = document.getElementById('lifetime-checkout-btn');
 
     const filters = {
         email: document.getElementById('filter-email'),
@@ -363,28 +395,6 @@ export function initUI(engine) {
         }
     }
 
-    function showFreeTierLimitNotice() {
-        hideLoading();
-        engine.clearSession();
-        dataOutput.replaceChildren();
-
-        const notice = document.createElement('p');
-        notice.textContent = FREE_TIER_LIMIT_MESSAGE;
-        notice.style.cssText = [
-            'color: var(--accent-amber)',
-            'padding: 16px',
-            'margin: 0',
-            'font-size: 14px',
-            'line-height: 1.5',
-            'border: 1px solid var(--border-color)',
-            'border-radius: 8px',
-            'background: var(--accent-amber-dim)'
-        ].join('; ');
-        dataOutput.appendChild(notice);
-        maskedPlainCache = '';
-        statsCounter.textContent = '0 leaks blocked';
-    }
-
     function scheduleProcessing() {
         clearTimeout(debounceTimer);
 
@@ -395,12 +405,6 @@ export function initUI(engine) {
 
             if (!rawText) {
                 resetProcessingOutput();
-                return;
-            }
-
-            if (!isProUser() && rawText.length > FREE_TIER_CHAR_LIMIT) {
-                latestRequestId += 1;
-                showFreeTierLimitNotice();
                 return;
             }
 
@@ -462,7 +466,7 @@ export function initUI(engine) {
     tabAnonymize.addEventListener('click', () => switchTab('anonymize'));
     tabUnmask.addEventListener('click', () => {
         if (!isProUser()) {
-            showProFeatureModal(PRO_PAYWALL_MESSAGE);
+            openTableMaskPaywall();
             return;
         }
 
@@ -490,6 +494,11 @@ export function initUI(engine) {
     copyBtn.addEventListener('click', async () => {
         const textToCopy = getCopyText();
         if (!textToCopy) return;
+
+        if (!isProUser()) {
+            openTableMaskPaywall();
+            return;
+        }
 
         try {
             await navigator.clipboard.writeText(textToCopy);
@@ -519,7 +528,34 @@ export function initUI(engine) {
     }
 
     updateCopyButtonLabel();
+    initPaywallModal();
+    initPricingRestoreLinks();
     initCookbookReader();
+
+    const annualBtn = document.querySelector('.js-annual-btn');
+    if (annualBtn) {
+        annualBtn.addEventListener('click', async () => {
+            try {
+                if (currentUser?.isPro) return;
+
+                if (!currentUser) {
+                    pendingCheckout = true;
+                    try {
+                        await loginWithGoogle();
+                    } catch (error) {
+                        pendingCheckout = false;
+                        throw error;
+                    }
+                    return;
+                }
+
+                openPaddleCheckout(currentUser);
+            } catch (error) {
+                console.error('Annual checkout failed:', error);
+            }
+        });
+    }
+
     initAuth(checkoutBtn, () => {
         if (dataInput.value) {
             scheduleProcessing();
