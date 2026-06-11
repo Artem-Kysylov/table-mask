@@ -11,7 +11,6 @@ const COPY_LABELS = {
 };
 
 const CHECKOUT_LABELS = {
-    loggedOut: 'Get Lifetime Access',
     loggedIn: 'Proceed to payment',
     proActive: 'Pro Lifetime Activated 💎'
 };
@@ -22,8 +21,7 @@ const CUSTOM_KEYWORDS_STORAGE_KEY = 'tablemask_custom_keywords';
 // Paddle v3 Billing
 const PADDLE_CONFIG = {
     environment: 'production',
-    token: 'live_da6aeff36419dd0a5148263e095',
-    priceId: 'pri_01ksjgnnktm1dh2e6axrbxm45b'
+    token: 'live_da6aeff36419dd0a5148263e095'
 };
 
 let currentUser = null;
@@ -51,10 +49,7 @@ function handleCheckoutSuccess() {
         currentUser.isPro = true;
     }
 
-    updateCheckoutButton(
-        document.getElementById('lifetime-checkout-btn'),
-        currentUser
-    );
+    updateAllCheckoutButtons(currentUser);
 }
 
 const waitForPaddle = setInterval(() => {
@@ -77,13 +72,16 @@ function maybeOpenPendingCheckout(user) {
         return;
     }
 
-    openPaddleCheckout(user);
+    // Default to lifetime plan for pending checkouts
+    const lifetimeBtn = document.getElementById('lifetime-checkout-btn');
+    const defaultPriceId = lifetimeBtn?.dataset.priceId || 'pri_01ktvj00d98wdsegce61r7qe3v';
+    openPaddleCheckout(user, defaultPriceId);
 }
 
-function openPaddleCheckout(user) {
+function openPaddleCheckout(user, priceId) {
     if (!isPaddleReady) {
         console.log('Paddle ещё загружается, повтор через 200мс...');
-        setTimeout(() => openPaddleCheckout(user), 200);
+        setTimeout(() => openPaddleCheckout(user, priceId), 200);
         return;
     }
 
@@ -93,7 +91,7 @@ function openPaddleCheckout(user) {
             theme: 'dark',
             locale: 'en'
         },
-        items: [{ priceId: PADDLE_CONFIG.priceId, quantity: 1 }],
+        items: [{ priceId: priceId, quantity: 1 }],
         customer: { email: user.email },
         customData: { uid: user.uid }
     });
@@ -251,14 +249,16 @@ function updateCheckoutButton(checkoutBtn, user) {
         return;
     }
 
+    const defaultLabel = checkoutBtn.dataset.labelDefault || 'Get Access';
+
     checkoutBtn.disabled = false;
     checkoutBtn.classList.remove('is-pro-active');
     checkoutBtn.textContent = user
         ? CHECKOUT_LABELS.loggedIn
-        : CHECKOUT_LABELS.loggedOut;
+        : defaultLabel;
 }
 
-function initAuth(checkoutBtn, onUserReady) {
+function initAuth(onUserReady) {
     onAuthChange(async (user) => {
         if (user) {
             try {
@@ -272,39 +272,48 @@ function initAuth(checkoutBtn, onUserReady) {
 
         currentUser = user;
         renderAuthZone(user);
-        updateCheckoutButton(checkoutBtn, user);
+        updateAllCheckoutButtons(user);
         updatePricingRestoreLinks(user);
         maybeOpenPendingCheckout(user);
         onUserReady?.(user);
     });
+}
 
-    if (!checkoutBtn) {
-        return;
-    }
+function updateAllCheckoutButtons(user) {
+    document.querySelectorAll('.checkout-btn').forEach(btn => {
+        updateCheckoutButton(btn, user);
+    });
+}
 
-    checkoutBtn.addEventListener('click', async () => {
-        try {
-            if (currentUser?.isPro) {
-                return;
-            }
+function initCheckoutButtons() {
+    document.querySelectorAll('.checkout-btn').forEach(btn => {
+        btn.addEventListener('click', async (event) => {
+            const priceId = event.target.dataset.priceId;
+            if (!priceId) return;
 
-            if (!currentUser) {
-                pendingCheckout = true;
-
-                try {
-                    await loginWithGoogle();
-                } catch (error) {
-                    pendingCheckout = false;
-                    throw error;
+            try {
+                if (currentUser?.isPro) {
+                    return;
                 }
 
-                return;
-            }
+                if (!currentUser) {
+                    pendingCheckout = true;
 
-            openPaddleCheckout(currentUser);
-        } catch (error) {
-            console.error('Checkout failed:', error);
-        }
+                    try {
+                        await loginWithGoogle();
+                    } catch (error) {
+                        pendingCheckout = false;
+                        throw error;
+                    }
+
+                    return;
+                }
+
+                openPaddleCheckout(currentUser, priceId);
+            } catch (error) {
+                console.error('Checkout failed:', error);
+            }
+        });
     });
 }
 
@@ -323,8 +332,6 @@ export function initUI(engine) {
     const unmaskZone = document.getElementById('unmask-zone');
     const aiResponseInput = document.getElementById('ai-response-input');
     const unmaskDisplay = document.getElementById('unmask-display');
-    const checkoutBtn = document.getElementById('lifetime-checkout-btn');
-
     const filters = {
         email: document.getElementById('filter-email'),
         phone: document.getElementById('filter-phone'),
@@ -532,31 +539,8 @@ export function initUI(engine) {
     initPricingRestoreLinks();
     initCookbookReader();
 
-    const annualBtn = document.querySelector('.js-annual-btn');
-    if (annualBtn) {
-        annualBtn.addEventListener('click', async () => {
-            try {
-                if (currentUser?.isPro) return;
-
-                if (!currentUser) {
-                    pendingCheckout = true;
-                    try {
-                        await loginWithGoogle();
-                    } catch (error) {
-                        pendingCheckout = false;
-                        throw error;
-                    }
-                    return;
-                }
-
-                openPaddleCheckout(currentUser);
-            } catch (error) {
-                console.error('Annual checkout failed:', error);
-            }
-        });
-    }
-
-    initAuth(checkoutBtn, () => {
+    initCheckoutButtons();
+    initAuth(() => {
         if (dataInput.value) {
             scheduleProcessing();
         }
