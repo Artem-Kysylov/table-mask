@@ -88,7 +88,7 @@ function openPaddleCheckout(user, priceId) {
     Paddle.Checkout.open({
         settings: {
             displayMode: 'overlay',
-            theme: 'dark',
+            theme: 'light',
             locale: 'en'
         },
         items: [{ priceId: priceId, quantity: 1 }],
